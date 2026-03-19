@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Musician Man - Professional Portfolio</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav>
+        <div class="nav-container">
+            <div class="logo">
+                <img src="IMG_9064j.jpg" alt="Profile" class="logo-img">
+                <span class="logo-text">Off Ryine</span>
+            </div>
+
+            <button id="nav-toggle" class="nav-toggle" aria-label="Toggle navigation">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+            <ul class="nav-menu">
+                <li><a href="#hero">Home</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#compositions">Compositions</a></li>
+                <li><a href="#portfolio">Portfolio</a></li>
+                <li><a href="#testimonials">Testimonials</a></li>
+                <li><a href="#gallery">Gallery</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+
+            <button id="owner-btn" class="owner-btn"><i class="fas fa-user-lock"></i> Owner</button>
+        </div>
+    </nav>
+
+    <section id="hero">
+        <div class="hero-content">
+            <h1>Welcome to My World</h1>
+            <p>Discover my music, videos, and visual art</p>
+            <a href="#portfolio" class="cta-button">Explore My Work</a>
+        </div>
+    </section>
+
+    <section id="about">
+        <div class="container">
+            <h2>About Me</h2>
+            <p>I'm a passionate musician creating soulful music and captivating visuals. This portfolio showcases my latest works - upload and explore my audio tracks, short videos, and images.</p>
+        </div>
+    </section>
+
+    <section id="compositions">
+        <div class="container">
+            <h2>Music I Wrote for Other Artists</h2>
+            <div class="compositions-grid">
+                <div class="composition-card">
+                    <div class="card-content">
+                        <h3>Mukwano Arcade</h3>
+                        <p class="artist">song</p>
+                        <div class="play-button">
+                            <i class="fas fa-play"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="composition-card">
+                    <div class="card-content">
+                        <h3>Nyange</h3>
+                        <p class="artist">song</p>
+                        <div class="play-button">
+                            <i class="fas fa-play"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="composition-card">
+                    <div class="card-content">
+                        <h3>Kiwaala kya Landlord</h3>
+                        <p class="artist">song</p>
+                        <div class="play-button">
+                            <i class="fas fa-play"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="composition-card">
+                    <div class="card-content">
+                        <h3>Gumpe</h3>
+                        <p class="artist">song</p>
+                        <div class="play-button">
+                            <i class="fas fa-play"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="portfolio">
+        <div class="container">
+            <h2>My Portfolio</h2>
+            <div class="portfolio-grid">
+                <div class="portfolio-item">
+                    <h3><i class="fas fa-music"></i> Music</h3>
+                    <input type="file" id="audio-upload" accept="audio/*" multiple class="owner-only-input">
+                    <div id="audio-list" class="media-list"></div>
+                </div>
+                <div class="portfolio-item">
+                    <h3><i class="fas fa-video"></i> Videos</h3>
+                    <input type="file" id="video-upload" accept="video/*" multiple class="owner-only-input">
+                    <div id="video-list" class="media-list"></div>
+                </div>
+                <div class="portfolio-item">
+                    <h3><i class="fas fa-image"></i> Images</h3>
+                    <input type="file" id="image-upload" accept="image/*" multiple class="owner-only-input">
+                    <div id="image-gallery" class="media-list"></div>
+                </div>
+            </div>
+            <div class="owner-warning">
+                <p>📤 Upload controls are available only for the site owner. Click <button id="owner-login-inline" class="owner-inline-btn">Owner login</button> to enable uploads.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="testimonials">
+        <div class="container">
+            <h2>What People Say</h2>
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <div class="stars">★★★★★</div>
+                    <p class="testimonial-text">"An incredibly talented musician with unique sound and vision. His compositions are pure art!"</p>
+                    <p class="testimonial-author">- Lineman</p>
+                </div>
+                <div class="testimonial-card">
+                    <div class="stars">★★★★★</div>
+                    <p class="testimonial-text">"Working with him on 'Nyange' was a fantastic experience. Truly professional and creative."</p>
+                    <p class="testimonial-author">- Umar</p>
+                </div>
+                <div class="testimonial-card">
+                    <div class="stars">★★★★★</div>
+                    <p class="testimonial-text">"His musical arrangements elevated our project to the next level. Highly recommended!"</p>
+                    <p class="testimonial-author">- Rescott</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="gallery">
+        <div class="container">
+            <h2>Featured Works</h2>
+            <div class="gallery-grid">
+                <div class="gallery-item">
+                    <img src="IMG_9064j.jpg" alt="Featured Work 1">
+                    <div class="gallery-overlay">
+                        <h3>Professional Studio</h3>
+                        <p>State-of-the-art recording setup</p>
+                    </div>
+                </div>
+                <div class="gallery-item">
+                    <img src="IMG_9064j.jpg" alt="Featured Work 2">
+                    <div class="gallery-overlay">
+                        <h3>Live Performance</h3>
+                        <p>Captivating stage presence</p>
+                    </div>
+                </div>
+                <div class="gallery-item">
+                    <img src="IMG_9064j.jpg" alt="Featured Work 3">
+                    <div class="gallery-overlay">
+                        <h3>Music Production</h3>
+                        <p>Creating chart-topping hits</p>
+                    </div>
+                </div>
+            </div>
+            <p class="gallery-note">More works coming soon. Upload your latest projects in the Portfolio section!</p>
+        </div>
+    </section>
+
+    <section id="contact">
+        <div class="container">
+            <h2>Follow Me</h2>
+            <div class="social-media">
+                <a href="https://www.youtube.com/@OffRyine" class="social-link" target="_blank"><i class="fab fa-youtube"></i><span>YouTube</span></a>
+                <a href="#" class="social-link"><i class="fab fa-instagram"></i><span>Instagram</span></a>
+                <a href="#" class="social-link"><i class="fab fa-facebook"></i><span>Facebook</span></a>
+                <a href="#" class="social-link"><i class="fab fa-spotify"></i><span>Spotify</span></a>
+                <a href="https://wa.me/256704106317" class="social-link" target="_blank"><i class="fab fa-whatsapp"></i><span>WhatsApp</span></a>
+            </div>
+        </div>
+    </section>
+
+    <footer id="footer">
+        <div class="footer-container">
+            <div class="footer-col">
+                <h3>About</h3>
+                <p>Crafting music that resonates and visuals that inspire. Follow my journey and stay connected.</p>
+            </div>
+            <div class="footer-col">
+                <h3>Quick Links</h3>
+                <ul class="footer-links">
+                    <li><a href="#hero">Home</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#compositions">Compositions</a></li>
+                    <li><a href="#portfolio">Portfolio</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h3>Contact</h3>
+                <p>Email: <a href="mailto:offryine@gmail.com">offryine@gmail.com</a></p>
+                <p>Phone: <a href="tel:+25670410631">+256 704 106 317</a></p>
+            </div>
+            <div class="footer-col footer-social">
+                <h3>Stay Connected</h3>
+                <div class="footer-social-icons">
+                    <a href="https://www.youtube.com/@OffRyine" aria-label="YouTube" target="_blank"><i class="fab fa-youtube"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                    <a href="#" aria-label="Spotify"><i class="fab fa-spotify"></i></a>
+                    <a href="https://wa.me/256704106317" aria-label="WhatsApp" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© <span id="footer-year"></span> Off Ryine Kalumba Ashraf Abubakari. All rights reserved.</p>
+            <button id="scroll-top" class="scroll-top" aria-label="Scroll to top"><i class="fas fa-chevron-up"></i></button>
+        </div>
+    </footer>
+
+    <div id="lightbox" class="lightbox">
+        <span class="close">&times;</span>
+        <img class="lightbox-content" id="lightbox-img">
+    </div>
+
+    <div id="owner-modal" class="modal" aria-hidden="true">
+        <div class="modal-content">
+            <span class="modal-close" aria-label="Close">&times;</span>
+            <h3>Owner Login</h3>
+            <p>Enter your password to enable upload controls.</p>
+            <input id="owner-password" class="modal-input" type="password" placeholder="Enter password" autocomplete="current-password">
+            <button id="owner-submit" class="modal-button">Unlock</button>
+            <p id="owner-error" class="modal-error"></p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
