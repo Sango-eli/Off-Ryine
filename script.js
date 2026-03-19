@@ -388,6 +388,12 @@ const ownerWarning = document.querySelector('.owner-warning');
 function setOwnerMode(enabled) {
     localStorage.setItem('isOwner', enabled ? 'true' : 'false');
 
+    // Hide/show upload input sections
+    const uploadSections = document.querySelectorAll('.owner-upload-section');
+    uploadSections.forEach(section => {
+        section.style.display = enabled ? 'block' : 'none';
+    });
+
     fileInputs.forEach(input => {
         input.disabled = !enabled;
         input.title = enabled ? 'Upload your media' : 'Owner only - Login to upload';
