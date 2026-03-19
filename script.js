@@ -73,22 +73,138 @@ document.getElementById('image-upload').addEventListener('change', function(even
 });
 
 function handleFileUpload(files, containerId, type) {
-    const container = document.getElementById(containerId);
-    container.innerHTML = '';
-
     if (files.length === 0) return;
 
     Array.from(files).forEach(file => {
-        const element = createMediaElement(file, type);
+        // Convert file to base64 and save
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const fileData = {
+                name: file.name,
+                type: file.type,
+                data: e.target.result
+            };
+            
+            saveMediaToStorage(containerId, fileData);
+            showToast(`${file.name} saved successfully!`);
+        };
+        reader.readAsDataURL(file);
+    });
+    
+    // Reset file input
+    document.getElementById(getInputIdByContainer(type)).value = '';
+}
+
+function getInputIdByContainer(type) {
+    const map = { 'audio': 'audio-upload', 'video': 'video-upload', 'image': 'image-upload' };
+    return map[type];
+}
+
+function saveMediaToStorage(containerId, fileData) {
+    let savedMedia = JSON.parse(localStorage.getItem(containerId) || '[]');
+    savedMedia.push(fileData);
+    localStorage.setItem(containerId, JSON.stringify(savedMedia));
+    
+    // Refresh display
+    loadMediaFromStorage(containerId);
+}
+
+function loadMediaFromStorage(containerId) {
+    const container = document.getElementById(containerId);
+    const savedMedia = JSON.parse(localStorage.getItem(containerId) || '[]');
+    
+    container.innerHTML = '';
+    
+    savedMedia.forEach((fileData, index) => {
+        const element = createMediaElementFromData(fileData, containerId, index);
         if (element) {
             container.appendChild(element);
         }
     });
 }
 
+function createMediaElementFromData(fileData, containerId, index) {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'media-item';
+    wrapper.style.position = 'relative';
+
+    const type = fileData.type.split('/')[0];
+
+    if (type === 'audio') {
+        const audio = document.createElement('audio');
+        audio.controls = true;
+        audio.src = fileData.data;
+        wrapper.appendChild(audio);
+    } else if (type === 'video') {
+        const video = document.createElement('video');
+        video.controls = true;
+        video.src = fileData.data;
+        video.style.width = '100%';
+        video.style.height = '200px';
+        video.style.objectFit = 'cover';
+        wrapper.appendChild(video);
+    } else if (type === 'image') {
+        const img = document.createElement('img');
+        img.src = fileData.data;
+        img.onclick = () => openLightbox(img.src);
+        wrapper.appendChild(img);
+    }
+
+    const fileName = document.createElement('p');
+    fileName.textContent = fileData.name;
+    fileName.style.fontSize = '0.8rem';
+    fileName.style.textAlign = 'center';
+    fileName.style.marginTop = '0.5rem';
+    wrapper.appendChild(fileName);
+
+    // Add delete button
+    const deleteBtn = document.createElement('button');
+    deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
+    deleteBtn.className = 'delete-media-btn';
+    deleteBtn.title = 'Delete this media';
+    deleteBtn.style.position = 'absolute';
+    deleteBtn.style.top = '5px';
+    deleteBtn.style.right = '5px';
+    deleteBtn.style.backgroundColor = 'rgba(255, 0, 110, 0.8)';
+    deleteBtn.style.border = 'none';
+    deleteBtn.style.borderRadius = '50%';
+    deleteBtn.style.width = '30px';
+    deleteBtn.style.height = '30px';
+    deleteBtn.style.cursor = 'pointer';
+    deleteBtn.style.color = 'white';
+    deleteBtn.style.fontSize = '1rem';
+    deleteBtn.style.display = 'flex';
+    deleteBtn.style.alignItems = 'center';
+    deleteBtn.style.justifyContent = 'center';
+    deleteBtn.style.transition = 'background-color 0.3s ease';
+    
+    deleteBtn.onmouseover = () => deleteBtn.style.backgroundColor = 'rgba(255, 0, 110, 1)';
+    deleteBtn.onmouseout = () => deleteBtn.style.backgroundColor = 'rgba(255, 0, 110, 0.8)';
+    
+    deleteBtn.onclick = (e) => {
+        e.stopPropagation();
+        deleteMediaFromStorage(containerId, index);
+        showToast(`${fileData.name} deleted`);
+    };
+    
+    wrapper.appendChild(deleteBtn);
+
+    return wrapper;
+}
+
+function deleteMediaFromStorage(containerId, index) {
+    let savedMedia = JSON.parse(localStorage.getItem(containerId) || '[]');
+    savedMedia.splice(index, 1);
+    localStorage.setItem(containerId, JSON.stringify(savedMedia));
+    
+    // Refresh display
+    loadMediaFromStorage(containerId);
+}
+
 function createMediaElement(file, type) {
     const wrapper = document.createElement('div');
     wrapper.className = 'media-item';
+    wrapper.style.position = 'relative';
 
     if (type === 'audio') {
         const audio = document.createElement('audio');
@@ -116,6 +232,38 @@ function createMediaElement(file, type) {
     fileName.style.textAlign = 'center';
     fileName.style.marginTop = '0.5rem';
     wrapper.appendChild(fileName);
+
+    // Add delete button
+    const deleteBtn = document.createElement('button');
+    deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
+    deleteBtn.className = 'delete-media-btn';
+    deleteBtn.title = 'Delete this media';
+    deleteBtn.style.position = 'absolute';
+    deleteBtn.style.top = '5px';
+    deleteBtn.style.right = '5px';
+    deleteBtn.style.backgroundColor = 'rgba(255, 0, 110, 0.8)';
+    deleteBtn.style.border = 'none';
+    deleteBtn.style.borderRadius = '50%';
+    deleteBtn.style.width = '30px';
+    deleteBtn.style.height = '30px';
+    deleteBtn.style.cursor = 'pointer';
+    deleteBtn.style.color = 'white';
+    deleteBtn.style.fontSize = '1rem';
+    deleteBtn.style.display = 'flex';
+    deleteBtn.style.alignItems = 'center';
+    deleteBtn.style.justifyContent = 'center';
+    deleteBtn.style.transition = 'background-color 0.3s ease';
+    
+    deleteBtn.onmouseover = () => deleteBtn.style.backgroundColor = 'rgba(255, 0, 110, 1)';
+    deleteBtn.onmouseout = () => deleteBtn.style.backgroundColor = 'rgba(255, 0, 110, 0.8)';
+    
+    deleteBtn.onclick = (e) => {
+        e.stopPropagation();
+        wrapper.remove();
+        showToast(`${file.name} removed`);
+    };
+    
+    wrapper.appendChild(deleteBtn);
 
     return wrapper;
 }
@@ -335,3 +483,10 @@ if (scrollTopBtn) {
 }
 
 updateFooterYear();
+
+// Initialize and load saved media on page load
+document.addEventListener('DOMContentLoaded', function() {
+    loadMediaFromStorage('image-gallery');
+    loadMediaFromStorage('audio-list');
+    loadMediaFromStorage('video-list');
+});
