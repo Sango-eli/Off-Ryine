@@ -131,10 +131,37 @@ function createMediaElementFromData(fileData, containerId, index) {
     const type = fileData.type.split('/')[0];
 
     if (type === 'audio') {
+        // Handle both file paths and base64 data
+        const audioSource = fileData.filePath || fileData.data;
+        const backgroundImage = fileData.backgroundImage ? `url('${fileData.backgroundImage}')` : 'none';
+        
+        const audioWrapper = document.createElement('div');
+        audioWrapper.style.backgroundImage = backgroundImage;
+        audioWrapper.style.backgroundSize = 'cover';
+        audioWrapper.style.backgroundPosition = 'center';
+        audioWrapper.style.padding = backgroundImage !== 'none' ? '20px' : '10px';
+        audioWrapper.style.borderRadius = backgroundImage !== 'none' ? '8px' : '0';
+        audioWrapper.style.minWidth = '100%';
+        audioWrapper.style.display = 'flex';
+        audioWrapper.style.alignItems = 'center';
+
         const audio = document.createElement('audio');
         audio.controls = true;
-        audio.src = fileData.data;
-        wrapper.appendChild(audio);
+        audio.controlsList = 'nodownload';
+        audio.style.width = '100%';
+        audio.style.minHeight = '40px';
+        
+        // Create source element for better compatibility
+        const source = document.createElement('source');
+        source.src = audioSource;
+        source.type = 'audio/mpeg';
+        audio.appendChild(source);
+        
+        // Fallback text
+        audio.textContent = 'Your browser does not support the audio element.';
+        
+        audioWrapper.appendChild(audio);
+        wrapper.appendChild(audioWrapper);
     } else if (type === 'video') {
         const video = document.createElement('video');
         video.controls = true;
@@ -492,7 +519,77 @@ updateFooterYear();
 
 // Initialize and load saved media on page load
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize default audio file
+    const savedAudio = JSON.parse(localStorage.getItem('audio-list') || '[]');
+    
+    // Check if we need to add or update the default audio
+    const defaultAudioExists = savedAudio.some(audio => audio.name === 'Joannah--K Universe--Offryine');
+    
+    if (!defaultAudioExists) {
+        // Add default audio file
+        const defaultAudio = {
+            name: 'Joannah--K Universe--Offryine',
+            type: 'audio/mpeg',
+            filePath: 'Joannah--K Universe--Offryine .mp3',
+            backgroundImage: 'IMG_4392.PNG'
+        };
+        savedAudio.push(defaultAudio);
+        localStorage.setItem('audio-list', JSON.stringify(savedAudio));
+    } else {
+        // Update existing default audio with correct background
+        const updatedAudio = savedAudio.map(audio => {
+            if (audio.name === 'Joannah--K Universe--Offryine') {
+                return {
+                    ...audio,
+                    backgroundImage: 'IMG_4392.PNG'
+                };
+            }
+            return audio;
+        });
+        localStorage.setItem('audio-list', JSON.stringify(updatedAudio));
+    }
+
     loadMediaFromStorage('image-gallery');
+    
+    // Initialize default image file
+    const savedImages = JSON.parse(localStorage.getItem('image-gallery') || '[]');
+    if (savedImages.length === 0) {
+        // Add default image file
+        const defaultImage = {
+            name: 'IMG_4392.PNG',
+            type: 'image/png',
+            filePath: 'IMG_4392.PNG',
+            data: 'IMG_4392.PNG'
+        };
+        savedImages.push(defaultImage);
+        localStorage.setItem('image-gallery', JSON.stringify(savedImages));
+    }
+    
     loadMediaFromStorage('audio-list');
+    
+    // Initialize default video file
+    const savedVideo = JSON.parse(localStorage.getItem('video-list') || '[]');
+    if (savedVideo.length === 0) {
+        // Add default video file
+        const defaultVideo = {
+            name: 'Kigwerawa',
+            type: 'video/mp4',
+            filePath: 'Kigwerawa.mp4',
+            data: 'Kigwerawa.mp4'
+        };
+        savedVideo.push(defaultVideo);
+        localStorage.setItem('video-list', JSON.stringify(savedVideo));
+    }
+    
     loadMediaFromStorage('video-list');
+
+    // Attempt autoplay for first audio in portfolio
+    setTimeout(() => {
+        const firstAudio = document.querySelector('#audio-list audio');
+        if (firstAudio) {
+            firstAudio.play().catch(() => {
+                showToast('Autoplay blocked by browser. Please press play to start audio.', 'info');
+            });
+        }
+    }, 500);
 });
