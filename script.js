@@ -174,21 +174,63 @@ function createMediaElementFromData(fileData, containerId, index) {
         wrapper.appendChild(audioWrapper);
     } else if (type === 'video') {
         const videoSource = fileData.filePath || fileData.data;
+        const videoId = 'video-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+        
+        const videoContainer = document.createElement('div');
+        videoContainer.style.position = 'relative';
+        
         const video = document.createElement('video');
+        video.id = videoId;
         video.controls = true;
+        video.playsinline = true;
+        video.preload = 'metadata';
         video.style.width = '100%';
         video.style.height = '200px';
         video.style.objectFit = 'cover';
         video.style.borderRadius = '8px';
-        video.preload = 'metadata';
 
         // Set src directly for local files
         video.src = videoSource;
 
         // Fallback text
         video.textContent = 'Your browser does not support the video element.';
-
-        wrapper.appendChild(video);
+        
+        videoContainer.appendChild(video);
+        
+        // Add custom play/pause button
+        const customControls = document.createElement('div');
+        customControls.className = 'custom-controls';
+        customControls.style.position = 'absolute';
+        customControls.style.bottom = '10px';
+        customControls.style.left = '10px';
+        customControls.style.display = 'flex';
+        customControls.style.gap = '10px';
+        
+        const playPauseBtn = document.createElement('button');
+        playPauseBtn.className = 'play-pause-btn';
+        playPauseBtn.onclick = () => togglePlayPause(videoId);
+        playPauseBtn.style.background = 'rgba(255, 0, 110, 0.9)';
+        playPauseBtn.style.border = 'none';
+        playPauseBtn.style.borderRadius = '50%';
+        playPauseBtn.style.width = '50px';
+        playPauseBtn.style.height = '50px';
+        playPauseBtn.style.color = 'white';
+        playPauseBtn.style.fontSize = '18px';
+        playPauseBtn.style.cursor = 'pointer';
+        playPauseBtn.style.display = 'flex';
+        playPauseBtn.style.alignItems = 'center';
+        playPauseBtn.style.justifyContent = 'center';
+        playPauseBtn.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
+        
+        const playIcon = document.createElement('i');
+        playIcon.className = 'fas fa-play';
+        playIcon.id = videoId + '-play-icon';
+        playPauseBtn.appendChild(playIcon);
+        
+        customControls.appendChild(playPauseBtn);
+        videoContainer.appendChild(customControls);
+        
+        wrapper.appendChild(videoContainer);
     } else if (type === 'image') {
         const imgSource = fileData.filePath || fileData.data;
         const img = document.createElement('img');
@@ -530,6 +572,43 @@ if (defaultVideoDeleteBtn) {
         }
     });
 }
+
+// Custom play/pause functionality
+function togglePlayPause(videoId) {
+    const video = document.getElementById(videoId);
+    const playIcon = document.getElementById(videoId + '-play-icon');
+    
+    if (video.paused) {
+        video.play();
+        playIcon.className = 'fas fa-pause';
+    } else {
+        video.pause();
+        playIcon.className = 'fas fa-play';
+    }
+}
+
+// Update play/pause icons when video state changes
+document.addEventListener('DOMContentLoaded', function() {
+    const videos = document.querySelectorAll('video');
+    videos.forEach(video => {
+        const videoId = video.id;
+        const playIcon = document.getElementById(videoId + '-play-icon');
+        
+        if (playIcon) {
+            video.addEventListener('play', () => {
+                playIcon.className = 'fas fa-pause';
+            });
+            
+            video.addEventListener('pause', () => {
+                playIcon.className = 'fas fa-play';
+            });
+            
+            video.addEventListener('ended', () => {
+                playIcon.className = 'fas fa-play';
+            });
+        }
+    });
+});
 
 // Set first nav link as active
 const firstLink = document.querySelector('.nav-menu a');
