@@ -113,7 +113,17 @@ function loadMediaFromStorage(containerId) {
     const container = document.getElementById(containerId);
     const savedMedia = JSON.parse(localStorage.getItem(containerId) || '[]');
     
-    container.innerHTML = '';
+    // For video-list, keep the default video and add uploaded ones
+    if (containerId === 'video-list') {
+        // Remove only dynamically added items, keep the default video
+        const defaultVideo = container.querySelector('.media-item');
+        container.innerHTML = '';
+        if (defaultVideo) {
+            container.appendChild(defaultVideo);
+        }
+    } else {
+        container.innerHTML = '';
+    }
     
     savedMedia.forEach((fileData, index) => {
         const element = createMediaElementFromData(fileData, containerId, index);
@@ -163,16 +173,30 @@ function createMediaElementFromData(fileData, containerId, index) {
         audioWrapper.appendChild(audio);
         wrapper.appendChild(audioWrapper);
     } else if (type === 'video') {
+        const videoSource = fileData.filePath || fileData.data;
         const video = document.createElement('video');
         video.controls = true;
-        video.src = fileData.data;
         video.style.width = '100%';
         video.style.height = '200px';
         video.style.objectFit = 'cover';
+        video.style.borderRadius = '8px';
+        video.preload = 'metadata';
+
+        // Set src directly for local files
+        video.src = videoSource;
+
+        // Fallback text
+        video.textContent = 'Your browser does not support the video element.';
+
         wrapper.appendChild(video);
     } else if (type === 'image') {
+        const imgSource = fileData.filePath || fileData.data;
         const img = document.createElement('img');
-        img.src = fileData.data;
+        img.src = imgSource;
+        img.style.width = '100%';
+        img.style.height = '200px';
+        img.style.objectFit = 'cover';
+        img.style.borderRadius = '8px';
         img.onclick = () => openLightbox(img.src);
         wrapper.appendChild(img);
     }
@@ -184,37 +208,40 @@ function createMediaElementFromData(fileData, containerId, index) {
     fileName.style.marginTop = '0.5rem';
     wrapper.appendChild(fileName);
 
-    // Add delete button
-    const deleteBtn = document.createElement('button');
-    deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
-    deleteBtn.className = 'delete-media-btn';
-    deleteBtn.title = 'Delete this media';
-    deleteBtn.style.position = 'absolute';
-    deleteBtn.style.top = '5px';
-    deleteBtn.style.right = '5px';
-    deleteBtn.style.backgroundColor = 'rgba(255, 0, 110, 0.8)';
-    deleteBtn.style.border = 'none';
-    deleteBtn.style.borderRadius = '50%';
-    deleteBtn.style.width = '30px';
-    deleteBtn.style.height = '30px';
-    deleteBtn.style.cursor = 'pointer';
-    deleteBtn.style.color = 'white';
-    deleteBtn.style.fontSize = '1rem';
-    deleteBtn.style.display = 'flex';
-    deleteBtn.style.alignItems = 'center';
-    deleteBtn.style.justifyContent = 'center';
-    deleteBtn.style.transition = 'background-color 0.3s ease';
-    
-    deleteBtn.onmouseover = () => deleteBtn.style.backgroundColor = 'rgba(255, 0, 110, 1)';
-    deleteBtn.onmouseout = () => deleteBtn.style.backgroundColor = 'rgba(255, 0, 110, 0.8)';
-    
-    deleteBtn.onclick = (e) => {
-        e.stopPropagation();
-        deleteMediaFromStorage(containerId, index);
-        showToast(`${fileData.name} deleted`);
-    };
-    
-    wrapper.appendChild(deleteBtn);
+    // Add delete button only for owner
+    const isOwner = localStorage.getItem('isOwner') === 'true';
+    if (isOwner) {
+        const deleteBtn = document.createElement('button');
+        deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
+        deleteBtn.className = 'delete-media-btn';
+        deleteBtn.title = 'Delete this media';
+        deleteBtn.style.position = 'absolute';
+        deleteBtn.style.top = '5px';
+        deleteBtn.style.right = '5px';
+        deleteBtn.style.backgroundColor = 'rgba(255, 0, 110, 0.8)';
+        deleteBtn.style.border = 'none';
+        deleteBtn.style.borderRadius = '50%';
+        deleteBtn.style.width = '30px';
+        deleteBtn.style.height = '30px';
+        deleteBtn.style.cursor = 'pointer';
+        deleteBtn.style.color = 'white';
+        deleteBtn.style.fontSize = '1rem';
+        deleteBtn.style.display = 'flex';
+        deleteBtn.style.alignItems = 'center';
+        deleteBtn.style.justifyContent = 'center';
+        deleteBtn.style.transition = 'background-color 0.3s ease';
+        
+        deleteBtn.onmouseover = () => deleteBtn.style.backgroundColor = 'rgba(255, 0, 110, 1)';
+        deleteBtn.onmouseout = () => deleteBtn.style.backgroundColor = 'rgba(255, 0, 110, 0.8)';
+        
+        deleteBtn.onclick = (e) => {
+            e.stopPropagation();
+            deleteMediaFromStorage(containerId, index);
+            showToast(`${fileData.name} deleted`);
+        };
+        
+        wrapper.appendChild(deleteBtn);
+    }
 
     return wrapper;
 }
@@ -434,6 +461,17 @@ function setOwnerMode(enabled) {
     if (ownerWarning) {
         ownerWarning.style.display = enabled ? 'none' : 'block';
     }
+
+    // Show/hide owner-only delete buttons
+    const ownerOnlyButtons = document.querySelectorAll('.owner-only');
+    ownerOnlyButtons.forEach(button => {
+        button.style.display = enabled ? 'flex' : 'none';
+    });
+
+    // Refresh media displays to show/hide delete buttons
+    loadMediaFromStorage('image-gallery');
+    loadMediaFromStorage('audio-list');
+    loadMediaFromStorage('video-list');
 }
 
 function openOwnerModal() {
@@ -480,6 +518,18 @@ ownerPasswordInput.addEventListener('keyup', (event) => {
 // Initialize
 const isOwner = localStorage.getItem('isOwner') === 'true';
 setOwnerMode(isOwner);
+
+// Add event listener for default video delete button
+const defaultVideoDeleteBtn = document.querySelector('#video-list .owner-only');
+if (defaultVideoDeleteBtn) {
+    defaultVideoDeleteBtn.addEventListener('click', () => {
+        const defaultVideoItem = document.querySelector('#video-list .media-item');
+        if (defaultVideoItem) {
+            defaultVideoItem.remove();
+            showToast('Kigwerawa video removed');
+        }
+    });
+}
 
 // Set first nav link as active
 const firstLink = document.querySelector('.nav-menu a');
@@ -567,19 +617,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     loadMediaFromStorage('audio-list');
     
-    // Initialize default video file
+    // Initialize default video file (only add uploaded videos to localStorage)
     const savedVideo = JSON.parse(localStorage.getItem('video-list') || '[]');
-    if (savedVideo.length === 0) {
-        // Add default video file
-        const defaultVideo = {
-            name: 'Kigwerawa',
-            type: 'video/mp4',
-            filePath: 'Kigwerawa.mp4',
-            data: 'Kigwerawa.mp4'
-        };
-        savedVideo.push(defaultVideo);
-        localStorage.setItem('video-list', JSON.stringify(savedVideo));
-    }
+    // Don't add default video to localStorage since it's embedded in HTML
     
     loadMediaFromStorage('video-list');
 
